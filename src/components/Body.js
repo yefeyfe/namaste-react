@@ -3,26 +3,23 @@ import { useEffect, useState } from "react";
 import Shimmer from "./Shimmer";
 import { RESTAURANT_API_URL } from "../utils/constants";
 import { Link } from "react-router-dom";
+import useOnlineStatus from "../utils/useOnlineStatus";
+import useRestaurantList from "../utils/useRestaurantList";
 
 const Body = () => {
-  const [listOfRestaurant, setListOfRestaurant] = useState([]);
-  const [filteredRestaurant, setFilteredRestaurant] = useState([]);
   const [searchText, setSearchText] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const onlineStatus = useOnlineStatus();
+  if (onlineStatus === false) {
+    return (
+      <h1>
+        Looks like you are offline!! Please check your internet connection.
+      </h1>
+    );
+  }
 
-  const fetchData = async () => {
-    const data = await fetch(RESTAURANT_API_URL);
-    const json = await data.json();
-    setListOfRestaurant(
-      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
-    );
-    setFilteredRestaurant(
-      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
-    );
-  };
+  const [listOfRestaurant, filteredRestaurant, setFilteredRestaurant] =
+    useRestaurantList();
 
   // Conditional Rendering
   return listOfRestaurant.length === 0 ? (
